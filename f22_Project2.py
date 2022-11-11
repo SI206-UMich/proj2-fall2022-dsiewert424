@@ -52,7 +52,6 @@ def get_listings_from_search_results(html_file):
 
         listings.append((title, cost, id))
 
-    print(listings)
     return listings
 
 
@@ -80,6 +79,35 @@ def get_listing_information(listing_id):
         number of bedrooms
     )
     """
+
+    with open("html_files/listing_" + listing_id + ".html") as f:
+        soup = BeautifulSoup(f, 'html.parser')
+    
+    #policy number
+    num = soup.find('li', class_='f19phm7j dir dir-ltr')
+    policy = num.find('span', class_='ll4r2nl dir dir-ltr').text
+    if re.match(r'[P|p]ending', policy):
+        policy = "Pending"
+    elif re.match(r'[E|e]xempt', policy):
+        policy = "Exempt"
+
+    #place type
+    blurb = soup.find('h2', class_='_14i3z6h').text
+    sentence = blurb.split()
+    place_type = "Entire Room"
+    for word in sentence:
+        if word == "private" or word == "Private":
+            place_type = "Private Room"
+        elif word == "shared" or word == "Shared":
+            place_type = "Shared Room"
+    
+    #number of bedrooms
+    rooms = list(soup.find_all('li', class_='l7n4lsf dir dir-ltr'))
+    bedrooms = int(rooms[1].text[3])
+    
+    info = (policy, place_type, bedrooms)
+    # print(info)
+    return info
     pass
 
 
@@ -89,15 +117,27 @@ def get_detailed_listing_database(html_file):
     the complete listing information using the functions you’ve created.
     This function takes in a variable representing the location of the search results html file.
     The return value should be in this format:
-
-
     [
         (Listing Title 1,Cost 1,Listing ID 1,Policy Number 1,Place Type 1,Number of Bedrooms 1),
         (Listing Title 2,Cost 2,Listing ID 2,Policy Number 2,Place Type 2,Number of Bedrooms 2),
         ...
     ]
     """
-    pass
+    listings = get_listings_from_search_results(html_file)
+    database = []
+    for listing in listings:
+        listing_title = listing[0]
+        cost = listing[1]
+        listing_id = listing[2]
+        listing_info = get_listing_information(listing_id)
+        policy_number = listing_info[0]
+        place_type = listing_info[1]
+        num_bedrooms = listing_info[2]
+        database.append((listing_title, cost, listing_id, policy_number, place_type, num_bedrooms))
+
+    print(database)
+    return database
+
 
 
 def write_csv(data, filename):
