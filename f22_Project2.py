@@ -103,9 +103,17 @@ def get_listing_information(listing_id):
     
     #number of bedrooms
     rooms = list(soup.find_all('li', class_='l7n4lsf dir dir-ltr'))
-    bedrooms = int(rooms[1].text[3])
+    bedroom = rooms[1].text
+   
+    if bedroom[3] == 'S':
+        num_bedrooms = 1
+    else:
+        num_bedrooms = int(bedroom[3])
     
-    info = (policy, place_type, bedrooms)
+    # bedrooms = int(rooms[1].text[3])
+    # print(bedrooms)
+    
+    info = (policy, place_type, num_bedrooms)
     # print(info)
     return info
     pass
@@ -135,7 +143,7 @@ def get_detailed_listing_database(html_file):
         num_bedrooms = listing_info[2]
         database.append((listing_title, cost, listing_id, policy_number, place_type, num_bedrooms))
 
-    print(database)
+
     return database
 
 
