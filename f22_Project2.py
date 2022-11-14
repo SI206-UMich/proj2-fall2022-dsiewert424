@@ -35,9 +35,11 @@ def get_listings_from_search_results(html_file):
     for parent in parent_list:
         #title
         title = parent.find("div", class_="t1jojoys dir dir-ltr").text
+        title = title.replace('\n', '')
+        title = title.replace('  ', ' ')
+        title = title.replace('  ', '')
 
         #cost
-        
         c = parent.find("span", class_="_tyxjp1").text
         cost = int(c.lstrip('$'))
 
@@ -86,9 +88,9 @@ def get_listing_information(listing_id):
     #policy number
     num = soup.find('li', class_='f19phm7j dir dir-ltr')
     policy = num.find('span', class_='ll4r2nl dir dir-ltr').text
-    if re.match(r'[P|p]ending', policy):
+    if re.search(r'[P|p]ending', policy):
         policy = "Pending"
-    elif re.match(r'[E|e]xempt', policy):
+    elif re.search(r'License not needed per OSTR', policy):
         policy = "Exempt"
 
     #place type
@@ -103,12 +105,12 @@ def get_listing_information(listing_id):
     
     #number of bedrooms
     rooms = list(soup.find_all('li', class_='l7n4lsf dir dir-ltr'))
-    bedroom = rooms[1].text
+    bedroom = rooms[1].text.split()
    
-    if bedroom[3] == 'S':
+    if bedroom[1] == 'Studio':
         num_bedrooms = 1
     else:
-        num_bedrooms = int(bedroom[3])
+        num_bedrooms = int(bedroom[1])
     
     # bedrooms = int(rooms[1].text[3])
     # print(bedrooms)
@@ -170,6 +172,24 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
+    #sort data by cost 
+    sorted_data = data
+    sorted_data.sort(key = lambda x : x[1])
+    column_names = ("Listing Title","Cost","Listing ID","Policy Number","Place Type","Number of Bedrooms")
+
+    # writing to csv file 
+    with open(filename, 'w') as csvfile: 
+        # creating a csv writer object 
+        csvwriter = csv.writer(csvfile)
+        
+        # writing the fields 
+        csvwriter.writerow(column_names) 
+        
+        # writing the data rows 
+        for item in sorted_data:
+            csvwriter.writerow(item)
+        
+    
     pass
 
 
@@ -190,9 +210,18 @@ def check_policy_numbers(data):
         listing id 2,
         ...
     ]
-
+    2.	STR-000####
     """
-    pass
+    incorrect_listings = []
+    for item in data:
+        if re.search(r'20(\d){2}\-00(\d){4}STR', item[3]) or re.search(r'STR\-000(\d){4}', item[3]):
+            continue
+        elif item[3] == "Pending" or item[3] == "Exempt":
+            continue
+        else:
+            incorrect_listings.append(item[2])
+
+    return incorrect_listings
 
 
 def extra_credit(listing_id):
@@ -209,6 +238,32 @@ def extra_credit(listing_id):
     gone over their 90 day limit, else return True, indicating the lister has
     never gone over their limit.
     """
+    with open("html_files/listing_" + listing_id + "_reviews.html") as f:
+        soup = BeautifulSoup(f, 'html.parser')
+
+    num_reviews = {}
+    reviews = soup.find_all("div", class_="r1are2x1 dir dir-ltr")
+    
+
+    for review in reviews:
+        date = review.find('li', class_="_1f1oir5").text
+        year = date.split()[1]
+        
+
+        num_reviews[year] = num_reviews.get(year, 0) + 1
+
+    for year in num_reviews:
+        if num_reviews[year] >= 90:
+            return False
+
+    return True
+
+
+    # 
+
+
+    
+
     pass
 
 
@@ -312,6 +367,11 @@ class TestCases(unittest.TestCase):
 
         # check that the first element in the list is '16204265'
         pass
+
+    def test_extra_credit(self):
+        self.assertEqual(extra_credit("1944564"), True)
+        self.assertEqual(extra_credit("16204265"), False)
+        
 
 
 if __name__ == '__main__':
