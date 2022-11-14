@@ -271,11 +271,17 @@ class TestCases(unittest.TestCase):
         # check that the variable you saved after calling the function is a list
         self.assertEqual(type(listings), list)
         # check that each item in the list is a tuple
+        for listing in listings:
+            self.assertEqual(type(listing), tuple)
 
         # check that the first title, cost, and listing id tuple is correct (open the search results html and find it)
+        self.assertEqual(listings[0][0], 'Loft in Mission District')
+        self.assertEqual(listings[0][1], 210)
+        self.assertEqual(listings[0][2], '1944564')
 
         # check that the last title is correct (open the search results html and find it)
-        pass
+        self.assertEqual(listings[len(listings) - 1][0], 'Guest suite in Mission District')
+
 
     def test_get_listing_information(self):
         html_list = ["1623609",
@@ -306,7 +312,6 @@ class TestCases(unittest.TestCase):
         # check that the third listing has one bedroom
         self.assertEqual(listing_informations[2][2], 1)
 
-        pass
 
     def test_get_detailed_listing_database(self):
         # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
@@ -321,9 +326,22 @@ class TestCases(unittest.TestCase):
 
         # check that the first tuple is made up of the following:
         # 'Loft in Mission District', 210, '1944564', '2022-004088STR', 'Entire Room', 1
+        self.assertEqual(detailed_database[0][0], 'Loft in Mission District')
+        self.assertEqual(detailed_database[0][1], 210)
+        self.assertEqual(detailed_database[0][2], '1944564')
+        self.assertEqual(detailed_database[0][3], '2022-004088STR')
+        self.assertEqual(detailed_database[0][4], 'Entire Room')
+        self.assertEqual(detailed_database[0][5], 1)
+        
 
         # check that the last tuple is made up of the following:
         # 'Guest suite in Mission District', 238, '32871760', 'STR-0004707', 'Entire Room', 1
+        self.assertEqual(detailed_database[len(detailed_database) - 1][0], 'Guest suite in Mission District')
+        self.assertEqual(detailed_database[len(detailed_database) - 1][1], 238)
+        self.assertEqual(detailed_database[len(detailed_database) - 1][2], '32871760')
+        self.assertEqual(detailed_database[len(detailed_database) - 1][3], 'STR-0004707')
+        self.assertEqual(detailed_database[len(detailed_database) - 1][4], 'Entire Room')
+        self.assertEqual(detailed_database[len(detailed_database) - 1][5], 1)
 
         pass
 
@@ -364,10 +382,13 @@ class TestCases(unittest.TestCase):
         # check that the return value is a list
         self.assertEqual(type(invalid_listings), list)
         # check that there is exactly one element in the string
+        self.assertEqual(len(invalid_listings), 1)
 
         # check that the element in the list is a string
+        self.assertEqual(type(invalid_listings[0]), str)
 
         # check that the first element in the list is '16204265'
+        self.assertEqual(invalid_listings[0], '16204265')
         pass
 
     def test_extra_credit(self):
