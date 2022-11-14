@@ -257,13 +257,6 @@ def extra_credit(listing_id):
             return False
 
     return True
-
-
-    # 
-
-
-    
-
     pass
 
 
@@ -305,10 +298,13 @@ class TestCases(unittest.TestCase):
             # check that the third element in the tuple is an int
             self.assertEqual(type(listing_information[2]), int)
         # check that the first listing in the html_list has policy number 'STR-0001541'
+        self.assertEqual(listing_informations[0][0], 'STR-0001541')
 
         # check that the last listing in the html_list is a "Private Room"
+        self.assertEqual(listing_informations[len(listing_informations) - 1][1], "Private Room")
 
         # check that the third listing has one bedroom
+        self.assertEqual(listing_informations[2][2], 1)
 
         pass
 
@@ -346,10 +342,16 @@ class TestCases(unittest.TestCase):
         # check that there are 21 lines in the csv
         self.assertEqual(len(csv_lines), 21)
         # check that the header row is correct
+        header = ["Listing Title","Cost","Listing ID","Policy Number","Place Type","Number of Bedrooms"]
+        self.assertEqual(csv_lines[0], header)
 
         # check that the next row is Private room in Mission District,82,51027324,Pending,Private Room,1
+        first_row = ["Private room in Mission District","82","51027324","Pending","Private Room","1"]
+        self.assertEqual(csv_lines[1], first_row)
 
         # check that the last row is Apartment in Mission District,399,28668414,Pending,Entire Room,2
+        last_row = ["Apartment in Mission District","399","28668414","Pending","Entire Room","2"]
+        self.assertEqual(csv_lines[len(csv_lines) - 1], last_row)
 
         pass
 
